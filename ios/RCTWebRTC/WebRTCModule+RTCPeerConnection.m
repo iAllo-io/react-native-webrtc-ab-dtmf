@@ -309,7 +309,7 @@ RCT_EXPORT_METHOD(peerConnectionAddICECandidate:(nonnull NSNumber *)objectID
                 }];
 }
 
-RCT_EXPORT_METHOD(peerConnectionSendDTMF:(nonnull NSString *)tone duration:(nonnull NSNumber *)duration interToneGap:(nonnull NSNumber *)interToneGap objectID:(nonnull NSNumber *)objectID)
+RCT_EXPORT_METHOD(peerConnectionSendDTMF:(nonnull NSString *)tone duration:(NSTimeInterval)duration interToneGap:(NSTimeInterval)interToneGap objectID:(nonnull NSNumber *)objectID)
 {
   RTCRtpSender* audioSender = nil ;
   RTCPeerConnection *peerConnection = self.peerConnections[objectID];
@@ -325,8 +325,7 @@ RCT_EXPORT_METHOD(peerConnectionSendDTMF:(nonnull NSString *)tone duration:(nonn
   if(audioSender){
     NSOperationQueue *queue = [[NSOperationQueue alloc] init];
     [queue addOperationWithBlock:^{
-    BOOL istoneplayed = [audioSender.dtmfSender insertDtmf :(NSString *)tone duration:(NSTimeInterval)duration interToneGap:(NSTimeInterval)interToneGap];
-    NSLog(@"DTMF Tone played :: [%s]", istoneplayed ? "true" : "false");
+        BOOL istoneplayed = [audioSender.dtmfSender insertDtmf:tone duration:duration interToneGap:interToneGap];
     }];
     return;
   }
