@@ -1,4 +1,5 @@
 import { NativeModules } from 'react-native';
+import RTCDTMFSender from './RTCDTMFSender';
 
 import MediaStreamTrack from './MediaStreamTrack';
 import RTCRtpCapabilities, { senderCapabilities, DEFAULT_AUDIO_CAPABILITIES } from './RTCRtpCapabilities';
@@ -12,7 +13,8 @@ export default class RTCRtpSender {
     _track: MediaStreamTrack | null = null;
     _peerConnectionId: number;
     _rtpParameters: RTCRtpSendParameters;
-
+    _dtmf:RTCDTMFSender;
+    
     constructor(info: {
         peerConnectionId: number,
         id: string,
@@ -22,7 +24,7 @@ export default class RTCRtpSender {
         this._peerConnectionId = info.peerConnectionId;
         this._id = info.id;
         this._rtpParameters = new RTCRtpSendParameters(info.rtpParameters);
-
+        this._dtmf = new RTCDTMFSender(info.peerConnectionId);
         if (info.track) {
             this._track = info.track;
         }
@@ -82,5 +84,8 @@ export default class RTCRtpSender {
 
     get id() {
         return this._id;
+    }
+    get dtmf(){
+        return this._dtmf
     }
 }
