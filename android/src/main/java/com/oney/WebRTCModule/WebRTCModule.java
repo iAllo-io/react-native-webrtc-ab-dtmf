@@ -617,16 +617,16 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
                     Log.d(TAG, "peerConnectioncanInsertDTMF() peerConnectionObserver is null");
                     return false;
                 }
-                RtpSender audioSender = peerConnectionObserver.getSender(senderId)
+                RtpSender audioSender = peerConnectionObserver.getSender(senderId);
                 
                 if (audioSender != null) {
                     DtmfSender dtmfSender = audioSender.dtmf();
-                    return dtmfSender.canInsertDTMF()
+                    return dtmfSender.canInsertDtmf();
                 }
                 Log.d(TAG, "peerConnectioncanInsertDTMF() audioSender is null");
-                return false
+                return false;
 
-                }).get() 
+                }).get(); 
             } catch (Exception e) {
                 Log.d(TAG, "peerConnectioncanInsertDTMF(): " + e.getMessage());
                 return false;
@@ -642,15 +642,15 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
                     Log.d(TAG, "peerConnectionSendDTMF() peerConnectionObserver is null");
                     return;
                 }
-                RtpSender audioSender = peerConnectionObserver.getSender(senderId)
+                RtpSender audioSender = peerConnectionObserver.getSender(senderId);
                 if (audioSender != null) {
                     DtmfSender dtmfSender = audioSender.dtmf();
 
-                    if(dtmfSender.canInsertDTMF()){
+                    if(dtmfSender.canInsertDtmf()){
                         dtmfSender.insertDtmf(tone, duration, interToneGap);
                         return;
                     }
-                    Log.d(TAG, "peerConnectionSendDTMF() canInsertDTMF is false");
+                    Log.d(TAG, "peerConnectionSendDTMF() canInsertDtmf is false");
                     return;
                 }
                 Log.d(TAG, "peerConnectionSendDTMF() audioSender is null");
