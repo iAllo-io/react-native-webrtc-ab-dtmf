@@ -6,22 +6,31 @@ const DEFAULT_INTER_TONE_GAP = 70;
 
 export default class RTCDTMFSender {
     _peerConnectionId: number;
-    constructor(peerConnectionId: number) {
+    _senderId: string;
+    constructor(peerConnectionId: number, senderId: string) {
         this._peerConnectionId = peerConnectionId;
+        this._senderId = senderId;
     }
 
-    get canInsertDTMF() {
-        return !!this._peerConnectionId;
+    get canInsertDTMF(): boolean {
+        // Blocking!
+        return WebRTCModule.peerConnectionCanInsertDTMF(
+            this._peerConnectionId,
+            this._senderId
+        );
     }
 
-    insertDTMF(tones: string, duration?: number, interToneGap?: number) {
-        const dur = duration || DEFAULT_DURATION;
-        const toneGap = interToneGap || DEFAULT_INTER_TONE_GAP;
+    insertDTMF(
+        tones: string,
+        duration = DEFAULT_DURATION,
+        interToneGap = DEFAULT_INTER_TONE_GAP
+    ) {
         WebRTCModule.peerConnectionSendDTMF(
             tones,
-            dur,
-            toneGap < 30 ? 30 : toneGap,
-            this._peerConnectionId
+            duration,
+            interToneGap < 30 ? 30 : interToneGap,
+            this._peerConnectionId,
+            this._senderId
         );
     }
 }
