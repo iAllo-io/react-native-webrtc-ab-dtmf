@@ -326,6 +326,7 @@ RCT_EXPORT_METHOD(peerConnectionSendDTMF:(nonnull NSString *)tone duration:(NSTi
     NSOperationQueue *queue = [[NSOperationQueue alloc] init];
     [queue addOperationWithBlock:^{
         BOOL istoneplayed = [audioSender.dtmfSender insertDtmf:tone duration:duration interToneGap:interToneGap];
+        NSLog(@"DTMF Tone played :: [%s]", istoneplayed ? "true" : "false");
     }];
     return;
   }

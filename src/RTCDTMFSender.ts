@@ -15,16 +15,8 @@ export default class RTCDTMFSender {
     }
 
     insertDTMF(tones: string, duration?: number, interToneGap?: number) {
-        //iOS native dtmf method accept duration and interToneGap in seconds, so we had to convert it to secs
-        const dur =
-            Platform.OS === "ios"
-                ? (duration || DEFAULT_DURATION) / 1000
-                : duration || DEFAULT_DURATION;
-        const toneGap =
-            Platform.OS === "ios"
-                ? (interToneGap || DEFAULT_INTER_TONE_GAP) / 1000
-                : interToneGap || DEFAULT_INTER_TONE_GAP;
-
+        const dur = duration || DEFAULT_DURATION;
+        const toneGap = interToneGap || DEFAULT_INTER_TONE_GAP;
         WebRTCModule.peerConnectionSendDTMF(
             tones,
             dur,
