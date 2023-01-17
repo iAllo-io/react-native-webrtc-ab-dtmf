@@ -308,27 +308,58 @@ RCT_EXPORT_METHOD(peerConnectionAddICECandidate:(nonnull NSNumber *)objectID
                   }
                 }];
 }
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(peerConnectionCanInsertDTMF:peerConnectionId:(nonnull NSNumber *)peerConnectionId senderId:(nonnull NSString *)senderId)
+{ 
+__block BOOL ret = NO;
+dispatch_sync(self.workerQueue, ^{
+    RTCPeerConnection *peerConnection = self.peerConnections[objectID];
+    if (!peerConnection) {
+        NSLog(@"peerConnectionCanInsertDTMF() peerConnection is nil")
+        return;
+    }
 
-RCT_EXPORT_METHOD(peerConnectionSendDTMF:(nonnull NSString *)tone duration:(NSTimeInterval)duration interToneGap:(NSTimeInterval)interToneGap objectID:(nonnull NSNumber *)objectID)
-{
+    RTCRtpSender *sender = nil;
+
+    for (RTCRtpSender *sender in peerConnection.senders){
+      if([sender.senderId isEqual: senderId]) {
+        audioSender = sender;
+        break;
+      } 
+    } 
+
+    if(audioSender){
+      ret = [audioSender.dtmfSender canInsertDTMF];
+    }
+
+    NSLog(@"peerConnectionCanInsertDTMF() audioSender is nil");
+    return;
+    });
+    
+    return @(ret);
+}
+
+RCT_EXPORT_METHOD(peerConnectionSendDTMF:(nonnull NSString *)tone duration:(NSTimeInterval)duration interToneGap:(NSTimeInterval)interToneGap peerConnectionId:(nonnull NSNumber *)peerConnectionId senderId:(nonnull NSString *)senderId)
+{ 
   RTCRtpSender* audioSender = nil ;
-  RTCPeerConnection *peerConnection = self.peerConnections[objectID];
+  RTCPeerConnection *peerConnection = self.peerConnections[peerConnectionId];
   if (!peerConnection) {
     NSLog(@"peerConnectionSendDTMF() peerConnection is nil");
     return;
   }
   for (RTCRtpSender *sender in peerConnection.senders){
-    if([[[sender track] kind] isEqualToString:@"audio"]) {
+    if([sender.senderId isEqual: senderId]) {
        audioSender = sender;
+       break;
      } 
   }
   if(audioSender){
-    NSOperationQueue *queue = [[NSOperationQueue alloc] init];
-    [queue addOperationWithBlock:^{
-        BOOL istoneplayed = [audioSender.dtmfSender insertDtmf:tone duration:duration interToneGap:interToneGap];
-        NSLog(@"DTMF Tone played :: [%s]", istoneplayed ? "true" : "false");
-    }];
-    return;
+    if([audioSender.dtmfSender canInsertDTMF]){
+      BOOL istoneplayed = [audioSender.dtmfSender insertDtmf:tone duration:duration interToneGap:interToneGap];
+      NSLog(@"DTMF Tone played :: [%s]", istoneplayed ? "true" : "false");
+      return;
+    }
+      NSLog(@"peerConnectionSendDTMF() canInsertDTMF is false");
+      return;
   }
   NSLog(@"peerConnectionSendDTMF() audioSender is nil");
   return;
