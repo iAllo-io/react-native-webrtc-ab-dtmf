@@ -1,7 +1,8 @@
 import { NativeModules } from "react-native";
 
-import RTCRtpReceiver from "./RTCRtpReceiver";
-import RTCRtpSender from "./RTCRtpSender";
+import RTCRtpCodecCapability from './RTCRtpCodecCapability';
+import RTCRtpReceiver from './RTCRtpReceiver';
+import RTCRtpSender from './RTCRtpSender';
 
 const { WebRTCModule } = NativeModules;
 
@@ -25,10 +26,10 @@ export default class RTCRtpTransceiver {
         receiver: RTCRtpReceiver;
     }) {
         this._peerConnectionId = args.peerConnectionId;
-        this._mid = args.mid ? args.mid : null;
+        this._mid = args.mid ?? null;
         this._direction = args.direction;
-        this._currentDirection = args.currentDirection;
-        this._stopped = args.isStopped;
+        this._currentDirection = args.currentDirection ?? null;
+        this._stopped = Boolean(args.isStopped);
         this._sender = args.sender;
         this._receiver = args.receiver;
     }
@@ -51,7 +52,7 @@ export default class RTCRtpTransceiver {
         }
 
         if (this._stopped) {
-            throw Error("Transceiver Stopped");
+            throw new Error('Transceiver Stopped');
         }
 
         if (this._direction === val) {
@@ -92,6 +93,14 @@ export default class RTCRtpTransceiver {
             this._peerConnectionId,
             this.sender.id
         ).then(() => this._setStopped());
+    }
+
+    setCodecPreferences(codecs: RTCRtpCodecCapability[]) {
+        WebRTCModule.transceiverSetCodecPreferences(
+            this._peerConnectionId,
+            this.sender.id,
+            codecs
+        );
     }
 
     _setStopped() {
